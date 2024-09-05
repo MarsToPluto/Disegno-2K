@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disegno 2K</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            flex-direction: column;
+        }
+        #canvas {
+            border: 2px solid #000;
+            background-color: #fff;
+            cursor: crosshair;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .control-group {
+            margin: 10px;
+        }
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(5, 40px);
+            grid-gap: 10px;
+            margin-top: 20px;
+        }
+        .color-palette div {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            border: 2px solid #ccc;
+            transition: border 0.3s;
+        }
+        .color-palette div:hover {
+            border-color: #000;
+        }
+        #saveBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        label {
+            display: block;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas" width="2048" height="2048"></canvas>
+
+    <!-- Color Palettes -->
+    <div class="color-palette" id="palette1">
+        <div style="background-color: #FF5733;" data-color="#FF5733"></div>
+        <div style="background-color: #33FF57;" data-color="#33FF57"></div>
+        <div style="background-color: #3357FF;" data-color="#3357FF"></div>
+        <div style="background-color: #FF33A1;" data-color="#FF33A1"></div>
+        <div style="background-color: #FFD133;" data-color="#FFD133"></div>
+    </div>
+
+    <div class="color-palette" id="palette2">
+        <div style="background-color: #DFFF00;" data-color="#DFFF00"></div>
+        <div style="background-color: #FFBF00;" data-color="#FFBF00"></div>
+        <div style="background-color: #FF7F50;" data-color="#FF7F50"></div>
+        <div style="background-color: #DE3163;" data-color="#DE3163"></div>
+        <div style="background-color: #9FE2BF;" data-color="#9FE2BF"></div>
+    </div>
+
+    <div class="color-palette" id="palette3">
+        <div style="background-color: #40E0D0;" data-color="#40E0D0"></div>
+        <div style="background-color: #6495ED;" data-color="#6495ED"></div>
+        <div style="background-color: #CCCCFF;" data-color="#CCCCFF"></div>
+        <div style="background-color: #FF69B4;" data-color="#FF69B4"></div>
+        <div style="background-color: #B0E0E6;" data-color="#B0E0E6"></div>
+    </div>
+
+    <button id="saveBtn">Save as PNG</button>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const saveBtn = document.getElementById('saveBtn');
+        let drawing = false;
+
+        // Set up the brush and background
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+
+        // Mouse events for drawing
+        canvas.addEventListener('mousedown', () => {
+            drawing = true;
+            ctx.beginPath();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (drawing) {
+                ctx.lineTo(event.offsetX, event.offsetY);
+                ctx.stroke();
+            }
+        });
+
+        // Apply selected color
+        const palettes = document.querySelectorAll('.color-palette div');
+        palettes.forEach(colorBox => {
+            colorBox.addEventListener('click', () => {
+                const selectedColor = colorBox.getAttribute('data-color');
+                ctx.strokeStyle = selectedColor;
+            });
+        });
+
+        // Save the canvas as a PNG file
+        saveBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'drawing.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+    </script>
+    
+</body>
+</html>

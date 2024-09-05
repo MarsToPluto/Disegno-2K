@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disegno 2K</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            flex-direction: column;
+        }
+        #canvas {
+            border: 2px solid #000;
+            background-color: #fff;
+            cursor: crosshair;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .control-group {
+            margin: 10px;
+        }
+        #saveBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        label {
+            display: block;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas" width="2048" height="2048"></canvas>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label for="brightness">Brightness</label>
+            <input type="range" id="brightness" min="0" max="200" value="100">
+        </div>
+        <div class="control-group">
+            <label for="exposure">Exposure</label>
+            <input type="range" id="exposure" min="0" max="200" value="100">
+        </div>
+        <div class="control-group">
+            <label for="contrast">Contrast</label>
+            <input type="range" id="contrast" min="0" max="200" value="100">
+        </div>
+        <div class="control-group">
+            <label for="saturation">Saturation</label>
+            <input type="range" id="saturation" min="0" max="200" value="100">
+        </div>
+        <div class="control-group">
+            <label for="hue">Hue</label>
+            <input type="range" id="hue" min="0" max="360" value="0">
+        </div>
+        <div class="control-group">
+            <label for="whiteBalance">White Balance</label>
+            <input type="range" id="whiteBalance" min="0" max="200" value="100">
+        </div>
+    </div>
+
+    <button id="saveBtn">Save as PNG</button>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const saveBtn = document.getElementById('saveBtn');
+        let drawing = false;
+
+        // Set up the brush and background
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+
+        // Mouse events for drawing
+        canvas.addEventListener('mousedown', () => {
+            drawing = true;
+            ctx.beginPath();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (drawing) {
+                ctx.lineTo(event.offsetX, event.offsetY);
+                ctx.stroke();
+            }
+        });
+
+        const controls = {
+            brightness: document.getElementById('brightness'),
+            exposure: document.getElementById('exposure'),
+            contrast: document.getElementById('contrast'),
+            saturation: document.getElementById('saturation'),
+            hue: document.getElementById('hue'),
+            whiteBalance: document.getElementById('whiteBalance')
+        };
+
+        const applyFilters = () => {
+            const brightness = controls.brightness.value;
+            const exposure = controls.exposure.value;
+            const contrast = controls.contrast.value;
+            const saturation = controls.saturation.value;
+            const hue = controls.hue.value;
+
+            const filterString = `
+                brightness(${brightness}%)
+                contrast(${contrast}%)
+                saturate(${saturation}%)
+                hue-rotate(${hue}deg)
+            `;
+
+            ctx.filter = filterString;
+            ctx.drawImage(canvas, 0, 0); // Re-draw the canvas with the applied filters
+        };
+
+        Object.values(controls).forEach(control => {
+            control.addEventListener('input', applyFilters);
+        });
+
+        // Save the canvas as a PNG file
+        saveBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'drawing.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+    </script>
+    
+</body>
+</html>
